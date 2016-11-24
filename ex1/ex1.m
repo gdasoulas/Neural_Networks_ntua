@@ -1,4 +1,4 @@
-%% Bhma 1 
+%% Bhma 1o 
 
 clear all
 
