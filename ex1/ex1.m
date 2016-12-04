@@ -42,10 +42,10 @@ clear i j ans rand_indices classes_count final_indices population_class
 [TrainData,PS] = removeconstantrows(TrainData);
 TestData = removeconstantrows('apply',TestData,PS);
 
-[TrainData,PS] = mapstd(TrainData);
-TestData = mapstd('apply',TestData,PS);
+% [TrainData,PS] = mapstd(TrainData);
+% TestData = mapstd('apply',TestData,PS);
 
-[TrainData,PS] = processpca(TrainData,0.0097);
+[TrainData,PS] = processpca(TrainData,0.00047);
 TestData = processpca('apply',TestData,PS);
 
 clear PS
@@ -55,13 +55,13 @@ clear PS
 for i=5:5:30
     for j=0:5:30
         for k=1:10
-            if j==0:
+            if j==0
                 layers=[i];
             else
                 layers=[i j];
             end
             mlp_net= newff(TrainData,TrainDataTargets,layers,{},'trainlm');
-            mlp_net.divideParam.trainRatio=0.8;
+            mlp_nt.divideParam.trainRatio=0.8;
             mlp_net.divideParam.valRatio=0.2;
             mlp_net.divideParam.testRatio=0;
             mlp_net.trainParam.epochs=1000;
@@ -85,13 +85,19 @@ clear recall precision i TestDataOutput mlp_net Fsc acc j k
 
 %% Saving mat files
 
-save('F_score.mat','F_score');
-save('accuracy.mat','accuracy');
+save('F_score_trainlm_withoutstd.mat','F_score');
+save('accuracy_trainlm_withoutstd.mat','accuracy');
 
 %%
 
-bar([5:5:30],accuracy);
+bar([5:5:30],acclm.accuracy);
 title('Accuracy according to neurons for two hidden layers'); 
 xlabel('First layer');
 ylabel('Accuracy');
 legend('0','5','10','15','20','25','30');
+
+
+
+%% BEST : TRAINLM -> 2 hidden layers : 20 - 15
+
+
