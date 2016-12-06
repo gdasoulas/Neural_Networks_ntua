@@ -1,7 +1,7 @@
 
 clear all
 clc
-
+    
 %% Bhma 1o 
 
 load dataSet.mat;
@@ -44,12 +44,12 @@ end
 clear recall precision i TestDataOutput mlp_net Fsc acc j k
 
 
-%% Bhma 6a BEST : TRAINLM -> 2 hidden layers : 20 - 15
+%% Bhma 6a - Transfer Functions in output Layer
+%BEST : TRAINLM -> 2 hidden layers : 20 - 15
 
-% TransferFcn={'hardlim','tansig','logsig','purelin'};
-TransferFcn={'hardlim'};
+TransferFcn={'hardlim','tansig','logsig','purelin'};
 for i=1:size(TransferFcn,2)
-[~,acc,Fscore]=create_NN(TrainData,TrainDataTargets,TestData,TestDataTargets,1,[20 15],...
+[~,acc,Fscore]=create_NN(TrainData,TrainDataTargets,TestData,TestDataTargets,10,[20 15],...
     'trainlm','learngdm',TransferFcn{i});
 save(strcat('accuracy_',TransferFcn{i},'.mat'),'acc');
 save(strcat('F_score_',TransferFcn{i},'.mat'),'Fscore');
@@ -57,6 +57,26 @@ end
 
 clear mlp acc Fscore TransferFcn i
 
+%% Bhma 6b - Learning Functions 
+%BEST : TRAINLM -> 2 hidden layers : 20 - 15
+
+
+LearnFcn={'learngdm','learngd'};
+for i=1:size(LearnFcn,2)
+[~,acc,Fscore]=create_NN(TrainData,TrainDataTargets,TestData,TestDataTargets,20,[20 15],...
+    'trainlm',LearnFcn{i},[]);
+save(strcat('accuracy_',LearnFcn{i},'.mat'),'acc');
+save(strcat('F_score_',LearnFcn{i},'.mat'),'Fscore');
+end
+
+clear mlp acc Fscore LearnFcn i
+
+%% Bhma 6c - Validation_Set
+
+[~,acc_val,Fscore_val]=create_NN(TrainData,TrainDataTargets,TestData,TestDataTargets,1,[20 15],...
+    'trainlm','learngdm',[]);
+% save('accuracy_without_val.mat','acc_val');
+% save('F_score_without_val.mat','Fscore_val');
 
 
 %% PLOTS

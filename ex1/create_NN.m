@@ -1,14 +1,15 @@
 function [mlp_net,accuracy,F_score]=create_NN(TrainData,TrainDataTargets,...
      TestData,TestDataTargets,iters,layers,trainfunc,learnfunc,transfer_fcn)
     for k=1:iters
-        mlp_net= newff(TrainData,TrainDataTargets,layers,{},trainfunc);
+        mlp_net= newff(TrainData,TrainDataTargets,layers,{},trainfunc,learnfunc);
         mlp_net.divideParam.trainRatio=0.8;
         mlp_net.divideParam.valRatio=0.2;
         mlp_net.divideParam.testRatio=0;
         mlp_net.trainParam.epochs=1000;
         mlp_net.trainParam.showWindow=true;
-        mlp_net.layers{2}.transferFcn=transfer_fcn;
-
+        if transfer_fcn~= []        
+            mlp_net.layers{2}.transferFcn=transfer_fcn;
+        end
         mlp_net=train(mlp_net,TrainData,TrainDataTargets);
 
         TestDataOutput=sim(mlp_net,TestData);
