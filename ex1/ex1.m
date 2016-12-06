@@ -42,10 +42,10 @@ clear i j ans rand_indices classes_count final_indices population_class
 [TrainData,PS] = removeconstantrows(TrainData);
 TestData = removeconstantrows('apply',TestData,PS);
 
-% [TrainData,PS] = mapstd(TrainData);
-% TestData = mapstd('apply',TestData,PS);
+[TrainData,PS] = mapstd(TrainData);     % comment it for no regularization
+TestData = mapstd('apply',TestData,PS); % comment it for no regularization
 
-[TrainData,PS] = processpca(TrainData,0.00047);
+[TrainData,PS] = processpca(TrainData,0.0095);
 TestData = processpca('apply',TestData,PS);
 
 clear PS
@@ -54,30 +54,15 @@ clear PS
 
 for i=5:5:30
     for j=0:5:30
-        for k=1:10
-            if j==0
-                layers=[i];
-            else
-                layers=[i j];
-            end
-            mlp_net= newff(TrainData,TrainDataTargets,layers,{},'trainlm');
-            mlp_nt.divideParam.trainRatio=0.8;
-            mlp_net.divideParam.valRatio=0.2;
-            mlp_net.divideParam.testRatio=0;
-            mlp_net.trainParam.epochs=1000;
-            mlp_net.trainParam.showWindow=false;
-
-            mlp_net=train(mlp_net,TrainData,TrainDataTargets);
-
-            TestDataOutput=sim(mlp_net,TestData);
-            [acc(k),precision,recall]=eval_Accuracy_Precision_Recall(TestDataOutput,TestDataTargets);
-
-            % good measure for combining precise and recall -> F-score - harmonic mean 
-
-            Fsc(k,:) = harmmean([precision recall],2);
+        if j==0
+            layers=[i];
+        else
+            layers=[i j];
         end
-        accuracy(i/5,j/5+1)=mean(acc)
-        F_score(i/5,j/5+1,:)=mean(Fsc,1);
+        [~,acc,Fsc]=create_NN(TrainData,TrainDataTargets,TestData,TestDataTargets,10,layers,...
+                'trainlm','learngdm','purelin');
+        accuracy(i/5,j/5+1)=acc;
+        F_score(i/5,j/5+1,:)=Fsc;
     end
 end
 
@@ -100,4 +85,6 @@ legend('0','5','10','15','20','25','30');
 
 %% BEST : TRAINLM -> 2 hidden layers : 20 - 15
 
-
+[mlp,acc,~]=create_NN(TrainData,TrainDataTargets,TestData,TestDataTargets,10,[20 15],...
+    'trainlm','learngdm','tansig');
+acc
